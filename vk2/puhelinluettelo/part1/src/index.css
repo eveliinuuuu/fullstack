@@ -1,0 +1,19 @@
+.message {
+    color: rgb(2, 68, 2);
+    background: lightgreen;
+    font-size: 20px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+.warning {
+color: rgb(68, 2, 2);
+background: rgb(170, 165, 165);
+font-size: 20px;
+border-style: solid;
+border-radius: 5px;
+padding: 10px;
+margin-bottom: 10px;
+}
