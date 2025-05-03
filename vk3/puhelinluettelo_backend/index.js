@@ -125,8 +125,6 @@ app.put('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-// Express virheidenkäsittelijä. Näiden funktioilla on neljä parametria.
-// Virheidenkäsittellijämiddleware tulee rekisteröidä muiden middlewarejen ja routejen jälkeen.
 const errorHandler = (error, request, response, next) => {
   console.log('In errorHandler')
 
@@ -155,7 +153,6 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-// tämä tulee kaikkien muiden middlewarejen ja routejen rekisteröinnin jälkeen!
 app.use(errorHandler)
 
 const PORT = process.env.PORT
