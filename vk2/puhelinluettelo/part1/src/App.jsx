@@ -31,7 +31,7 @@ const PersonForm = ({ addContact, handleContactChange, handleNumberChange, newNa
 const Numbers = ({ contactsToShow, removeContact }) => {
   return (
     <ul>
-      {contactsToShow.map(person => <li key={person.name}>{person.name} {person.number} <button onClick={() => removeContact(person.id)}> Delete </button></li>)}
+      {contactsToShow.map(person => <li key={person.id}>{person.name} {person.number} <button onClick={() => removeContact(person.id)}> Delete </button></li>)}
     </ul>
   )
 }
@@ -57,45 +57,53 @@ const App = () => {
       number: newNumber,
     }
 
-    const names = persons.map(person => person.name)
-    const found = names.find((name) => name === newName)
+    console.log(personObject)
 
-    if (! (found === undefined )) {
-      confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
-      const person = persons.find((person) => person.name === found)
-      const person_id = person.id
-      console.log(person_id)
-      const changedContact = {...person, number: personObject.number}
-      personService
-        .update(person_id, changedContact)
-        .then((returnedPerson) => {
-          setPersons(persons.map((person) => person.id !== person_id ? person : returnedPerson))
+    personService.getAll()
+    .then((existingPersons) => {
+      const found = existingPersons.find((person) => person.name === newName)
+      return found})
+    .then((found) => {
+      if (found !== undefined) {
+        const id = found.id
+        personService.update(id, personObject)
+        .then((returnedPersons) => {
+          personService.getAll().then((initialPersons) => {
+            setPersons(initialPersons)
+          })
+          .then(setNewName("Add name..."))
+          .then(setNewNumber("Add number..."))
+          .then(setMessage(`Updated ${personObject.name}`))
+          .then(setTimeout(() => {
+            setMessage(null)
+          }, 3000))
         })
-        .then(setNewName('Add name...'))
-        .then(setNewNumber('Add number...'))
-        .then(setMessage(`Updated ${person.name}`))
-        .then(setTimeout(() => {
-          setMessage(null)
-        }, 5000))
         .catch(error => {
-          setMessage(`${person.name} has been removed from the server`)
+          setMessage(error.response.data.error)
           setTimeout(() => {
             setMessage(null)
-          }, 5000)
-          setPersons(persons.filter(n => n.id !== person_id))
+          }, 6000)
         })
-    
-    } else {
-      personService.create(personObject).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson))
-        setNewName('Add name...')
-        setNewNumber('Add number...')
-        setMessage(`Added ${personObject.name}`)
-        setTimeout(() => {
+      } else {
+        personService.create(personObject)
+        .then((returnedPersons) => {
+        personService.getAll().then((initialPersons) => {
+          setPersons(initialPersons)
+        })
+        .then(setNewName("Add name..."))
+        .then(setNewNumber("Add number..."))
+        .then(setMessage(`Added name`))
+        .then(setTimeout(() => {
           setMessage(null)
-        }, 5000)
-      })
-  }}
+        }, 3000))
+    })
+    .catch(error => {
+      setMessage(error.response.data.error)
+      setTimeout(() => {
+        setMessage(null)
+      }, 6000)
+    })   
+  }})}
 
   const handleContactChange = (event) => {
     console.log(event.target.value)
